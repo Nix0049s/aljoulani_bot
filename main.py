@@ -208,7 +208,8 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("settings", settings))
     app.add_handler(CommandHandler("setupca", setupca))
 
-    app.post_init = lambda _: asyncio.create_task(set_jobs(app))
+    app.post_init = set_jobs
+
 
     print("Al Joulani Bot running with full features and 24/7 monitoring")
     app.run_polling()
