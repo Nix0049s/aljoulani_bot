@@ -114,6 +114,8 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Settings:", reply_markup=keyboard
     )
+async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("أمر /add جاهز. سيتم استخدامه لاحقًا لمراقبة العقود.")
 
 # ========== تحليل العملة ==========
 async def send_token_analysis(update, token):
