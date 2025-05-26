@@ -1,1 +1,10 @@
+whale_alert.gif
+buy_low.jpg
+aljoulani_bot/
+│
+├── main.py
+├── requirements.txt
+├── assets/
+│   ├── whale_alert.gif
+│   └── buy_low.jpg
 
