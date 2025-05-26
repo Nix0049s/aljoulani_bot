@@ -6,10 +6,10 @@ import asyncio
 import aiohttp
 import json
 import websockets
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.ext import (
-    ApplicationBuilder, CommandHandler, ContextTypes, CallbackContext
+    ApplicationBuilder, CommandHandler, ContextTypes, CallbackContext, CallbackQueryHandler
 )
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -37,7 +37,6 @@ keyboard = ReplyKeyboardMarkup(
 watched_contracts = set()
 contract_by_group = {}
 
-# ========== أوامر البوت ==========
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = "Welcome to Al Joulani Bot – your smart gateway to Solana.\nTap any command to begin.\nPowered by @Nix0049"
     await update.message.reply_text(msg, reply_markup=keyboard)
@@ -111,11 +110,29 @@ async def off(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await check_owner(update): return
-    await update.message.reply_text(
-        "Settings:", reply_markup=keyboard
-    )
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔒 Toggle Alerts", callback_data="toggle_alerts")],
+        [InlineKeyboardButton("📷 Change Image", callback_data="change_image")],
+        [InlineKeyboardButton("🔍 Analysis Settings", callback_data="analysis_settings")]
+    ])
+    await update.message.reply_text("Select a setting to update:", reply_markup=keyboard)
+
+async def handle_settings_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    action = query.data
+
+    if action == "toggle_alerts":
+        await query.edit_message_text("Alerts toggled ✅")
+    elif action == "change_image":
+        await query.edit_message_text("Please send the new image path or upload it.")
+    elif action == "analysis_settings":
+        await query.edit_message_text("Coming soon: Custom analysis filters 🚀")
+    else:
+        await query.edit_message_text("Invalid selection.")
+
 async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("أمر /add جاهز. سيتم استخدامه لاحقًا لمراقبة العقود.")
+    await update.message.reply_text("أمر /add جاهز. سيتم استخدامه لاحقاً لمراقبة العقود.")
 
 # ========== تحليل العملة ==========
 async def send_token_analysis(update, token):
@@ -207,13 +224,12 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("add", add))
     app.add_handler(CommandHandler("settings", settings))
     app.add_handler(CommandHandler("setupca", setupca))
+    app.add_handler(CallbackQueryHandler(handle_settings_action))
 
     async def post_init(app):
         await set_jobs(app)
 
     app.post_init = post_init
-
-
 
     print("Al Joulani Bot running with full features and 24/7 monitoring")
     app.run_polling()
