@@ -208,7 +208,10 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("settings", settings))
     app.add_handler(CommandHandler("setupca", setupca))
 
-    app.post_init = set_jobs
+  async def post_init(app):
+    await set_jobs(app)
+
+app.post_init = post_init
 
 
     print("Al Joulani Bot running with full features and 24/7 monitoring")
